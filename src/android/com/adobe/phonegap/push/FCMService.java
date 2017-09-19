@@ -335,7 +335,7 @@ public class FCMService extends FirebaseMessagingService implements PushConstant
             createNotification(context, extras);
         }
 
-        if(!PushPlugin.isActive() && "1".equals(forceStart)){
+        /* if(!PushPlugin.isActive() && "1".equals(forceStart)){
             Log.d(LOG_TAG, "app is not running but we should start it and put in background");
             Intent intent = new Intent(this, PushHandlerActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -347,7 +347,7 @@ public class FCMService extends FirebaseMessagingService implements PushConstant
             Log.d(LOG_TAG, "app is not running and content available true");
             Log.d(LOG_TAG, "send notification event");
             PushPlugin.sendExtras(extras);
-        }
+        } */
     }
 
     public void createNotification(Context context, Bundle extras) {
@@ -357,10 +357,17 @@ public class FCMService extends FirebaseMessagingService implements PushConstant
         Resources resources = context.getResources();
 
         int notId = parseInt(NOT_ID, extras);
-        Intent notificationIntent = new Intent(this, PushHandlerActivity.class);
-        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        notificationIntent.putExtra(PUSH_BUNDLE, extras);
-        notificationIntent.putExtra(NOT_ID, notId);
+        Intent notificationIntent;
+
+        if (extras.get("pinpoint.deeplink") != null) {
+            notificationIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(extras.getString("pinpoint.deeplink")));
+            notificationIntent.putExtra(NOT_ID, notId);
+        } else {
+            notificationIntent = new Intent(this, PushHandlerActivity.class);
+            notificationIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            notificationIntent.putExtra(PUSH_BUNDLE, extras);
+            notificationIntent.putExtra(NOT_ID, notId);
+        }
 
         int requestCode = new Random().nextInt();
         PendingIntent contentIntent = PendingIntent.getActivity(this, requestCode, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
