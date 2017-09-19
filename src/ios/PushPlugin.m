@@ -426,8 +426,7 @@
     {
         NSMutableDictionary* message = [NSMutableDictionary dictionaryWithCapacity:4];
         NSMutableDictionary* additionalData = [NSMutableDictionary dictionaryWithCapacity:4];
-
-
+        
         for (id key in notificationMessage) {
             if ([key isEqualToString:@"aps"]) {
                 id aps = [notificationMessage objectForKey:@"aps"];
@@ -468,6 +467,11 @@
                 [additionalData setObject:[notificationMessage objectForKey:key] forKey:key];
             }
         }
+        
+        NSString *deepLinkString = [[[notificationMessage objectForKey:@"data"] objectForKey:@"pinpoint"] objectForKey:@"deeplink"];
+        if (deepLinkString != nil) {
+            [message setObject:deepLinkString forKey:@"deeplink"];
+        }
 
         if (isInline) {
             [additionalData setObject:[NSNumber numberWithBool:YES] forKey:@"foreground"];
@@ -482,7 +486,7 @@
         }
 
         [message setObject:additionalData forKey:@"additionalData"];
-
+        
         // send notification message
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:message];
         [pluginResult setKeepCallbackAsBool:YES];
