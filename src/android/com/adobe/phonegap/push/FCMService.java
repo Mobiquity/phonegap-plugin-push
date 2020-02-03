@@ -430,6 +430,16 @@ public class FCMService extends FirebaseMessagingService implements PushConstant
     Log.d(LOG_TAG, "stored sound=" + soundOption);
     Log.d(LOG_TAG, "stored vibrate=" + vibrateOption);
 
+    if (extras.get("deeplink") != null) {
+        notificationIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(extras.getString("deeplink")));
+        notificationIntent.putExtra(NOT_ID, notId);
+    } else {
+        notificationIntent = new Intent(this, PushHandlerActivity.class);
+        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        notificationIntent.putExtra(PUSH_BUNDLE, extras);
+        notificationIntent.putExtra(NOT_ID, notId);
+    }
+
     /*
      * Notification Vibration
      */
@@ -474,69 +484,6 @@ public class FCMService extends FirebaseMessagingService implements PushConstant
     setNotificationLargeIcon(extras, packageName, resources, mBuilder);
 
     }
-
-  public void createNotification(Context context, Bundle extras) {
-    NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-    String appName = getAppName(this);
-    String packageName = context.getPackageName();
-    Resources resources = context.getResources();
-
-    int notId = parseInt(NOT_ID, extras);
-    Intent notificationIntent;
-
-    if (extras.get("pinpoint.deeplink") != null) {
-        notificationIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(extras.getString("pinpoint.deeplink")));
-        notificationIntent.putExtra(NOT_ID, notId);
-    } else {
-        notificationIntent = new Intent(this, PushHandlerActivity.class);
-        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        notificationIntent.putExtra(PUSH_BUNDLE, extras);
-        notificationIntent.putExtra(NOT_ID, notId);
-    }
-    /*
-     * Notification Sound
-     */
-    if (soundOption) {
-      setNotificationSound(context, extras, mBuilder);
-    }
-
-    /*
-     *  LED Notification
-     */
-    setNotificationLedColor(extras, mBuilder);
-
-    /*
-     *  Priority Notification
-     */
-    setNotificationPriority(extras, mBuilder);
-
-    /*
-     * Notification message
-     */
-    setNotificationMessage(notId, extras, mBuilder);
-
-    /*
-     * Notification count
-     */
-    setNotificationCount(context, extras, mBuilder);
-
-    /*
-     *  Notification ongoing
-     */
-    setNotificationOngoing(extras, mBuilder);
-
-    /*
-     * Notification count
-     */
-    setVisibility(context, extras, mBuilder);
-
-    /*
-     * Notification add actions
-     */
-    createActions(extras, mBuilder, resources, packageName, notId);
-
-    mNotificationManager.notify(appName, notId, mBuilder.build());
-  }
 
   private void updateIntent(Intent intent, String callback, Bundle extras, boolean foreground, int notId) {
     intent.putExtra(CALLBACK, callback);

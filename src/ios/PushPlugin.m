@@ -454,6 +454,8 @@
                         [message setObject:value forKey:@"sound"];
                     } else if ([key isEqualToString:@"image"]) {
                         [message setObject:value forKey:@"image"];
+                    } else if ([key isEqualToString:@"deeplink"]) {
+                        [message setObject:value forKey:@"deeplink"];
                     } else {
                         [additionalData setObject:value forKey:key];
                     }
@@ -461,11 +463,6 @@
             } else {
                 [additionalData setObject:[notificationMessage objectForKey:key] forKey:key];
             }
-        }
-        
-        NSString *deepLinkString = [[[notificationMessage objectForKey:@"data"] objectForKey:@"pinpoint"] objectForKey:@"deeplink"];
-        if (deepLinkString != nil) {
-            [message setObject:deepLinkString forKey:@"deeplink"];
         }
 
         if (isInline) {
