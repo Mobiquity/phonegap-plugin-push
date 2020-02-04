@@ -370,11 +370,13 @@ public class FCMService extends FirebaseMessagingService implements PushConstant
     String appName = getAppName(this);
     String packageName = context.getPackageName();
     Resources resources = context.getResources();
+    String pinpointLink = extras.getString("pinpoint.deeplink");
+    String pinpointUrl = extras.getString("pinpoint.url");
 
     Intent notificationIntent;
 
-    if (extras.get("deeplink") != null) {
-      notificationIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(extras.getString("deeplink")));
+    if (pinpointLink != null || pinpointUrl != null) {
+      notificationIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(pinpointLink != null ? pinpointLink : pinpointUrl));
     } else {
       notificationIntent = new Intent(this, PushHandlerActivity.class);
     }
