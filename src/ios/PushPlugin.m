@@ -423,6 +423,14 @@
         NSMutableDictionary* additionalData = [NSMutableDictionary dictionaryWithCapacity:4];
         
         for (id key in notificationMessage) {
+            if ([key isEqualToString:@"data"]) {
+                id data = [notificationMessage objectForKey:@"data"];
+                NSString *deeplink = [[data objectForKey:@"pinpoint"] objectForKey:@"deeplink"];
+                if (deeplink != nil) {
+                    [message setObject:deeplink forKey:@"deeplink"];
+                }
+            }
+            
             if ([key isEqualToString:@"aps"]) {
                 id aps = [notificationMessage objectForKey:@"aps"];
 
@@ -454,8 +462,6 @@
                         [message setObject:value forKey:@"sound"];
                     } else if ([key isEqualToString:@"image"]) {
                         [message setObject:value forKey:@"image"];
-                    } else if ([key isEqualToString:@"deeplink"]) {
-                        [message setObject:value forKey:@"deeplink"];
                     } else {
                         [additionalData setObject:value forKey:key];
                     }
